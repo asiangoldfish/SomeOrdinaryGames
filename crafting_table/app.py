@@ -7,6 +7,7 @@ import message
 import error
 import item
 
+# Initialization
 pygame.init()
 pygame.font.init()
 
@@ -28,25 +29,30 @@ clock = pygame.time.Clock()
 delta = 0.0
 
 my_inventory = inventory.Inventory(
-
-    pos = np.array((170, 500)),
+    pos=np.array((170, 500)),
     size=np.array([100.0, 100.0]),
     divisions=np.array((4, 4)),
-    color=pygame.Color(0,0,0),
-    gap = 20.0)
-my_inventory.create_grid()
-success, err = my_inventory.add_item(
-    item_type=item.ItemType.WOOD,
-    position=np.array((4,1))
+    color=pygame.Color(0, 0, 0),
+    gap=20.0)
+
+crafting_table = inventory.Inventory(
+    pos=np.array((170, 200)),
+    size=np.array((100, 100)),
+    divisions=np.array((2, 1)),
+    color=pygame.Color(0, 0, 0),
+    gap=20.0)
+
+crafting_output = inventory.Inventory(
+    pos=np.array((540, 200)),
+    size=np.array((100, 100)),
+    divisions=np.array((1, 1)),
+    color=pygame.Color(0, 0, 0),
+    gap=0
 )
-if err.type == error.ErrorType.FATAL:
-    print(err.message)
-    exit(1)
 
 my_message = message.Message(
-    pos=np.array((200,100)),
-    text="The Fake Minesweeper"
-)
+    pos=np.array((200, 100)),
+    text="Crafting Table")
 
 while not is_closing:
     screen.fill((127, 127, 127))
@@ -59,22 +65,37 @@ while not is_closing:
             case pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     is_closing = True
+                if event.key == pygame.K_SPACE:
+                    my_inventory.add_item(
+                        item_type=item.ItemType.WOOD)
 
             # Select tile
-            # case pygame.MOUSEBUTTONDOWN:
-            #     is_bomb_tile, tile_index = my_inventory.get_overlapped_tile()
-            #     if tile_index is not None:
-            #         my_inventory.colors[tile_index[0]][tile_index[1]] = my_inventory.default_color
-            #         if is_bomb_tile:
-            #             my_message.text = "Game over!"
-            #             my_inventory.colors[tile_index[0]][tile_index[1]] = my_inventory.highlight_color
-                
+            case pygame.MOUSEBUTTONDOWN:
+                # Move item from inventory to crafting table
+                selected_inventory_item, position = my_inventory.get_overlapped_tile()
+                if selected_inventory_item:
+                    # Return back to inventory if the crafting table is full
+                    selected_inventory_item, _ = crafting_table.add_item(selected_inventory_item)
+                    my_inventory.add_item(
+                        item=selected_inventory_item,
+                        position=position
+                    )
+                elif position is not None:
+                    # Put item back to inventory if the crafting table is full
+                    my_inventory.add_item(
+                        item=selected_inventory_item,
+                        position=position
+                    )
 
-
+                crafting_table_item, position = crafting_table.get_overlapped_tile()
+                if crafting_table_item:
+                    my_inventory.add_item(selected_inventory_item)
 
     my_inventory.draw(screen)
+    crafting_table.draw(screen)
+    crafting_output.draw(screen)
 
-    my_message.draw(screen)
+    # my_message.draw(screen)
 
     pygame.display.update()
 
