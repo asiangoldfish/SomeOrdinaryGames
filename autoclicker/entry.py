@@ -5,6 +5,7 @@ import core.app as app
 import sprite
 import game
 import core.message as message
+import ui
 
 import atexit
 
@@ -47,6 +48,8 @@ my_message = message.Message(
     text="0"
 )
 
+my_button = ui.Button(100, 400, 200, 600, (128, 50, 30))
+
 while not my_app.is_closing:
     my_app.screen.fill((127, 127, 127))
 
@@ -82,6 +85,8 @@ while not my_app.is_closing:
     upgrade_grid.draw(my_app.screen)
 
     my_message.draw(my_app.screen)
+
+    my_button.draw(my_app.screen)
 
     pygame.display.update()
 
