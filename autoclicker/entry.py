@@ -48,13 +48,22 @@ my_message = message.Message(
     text="0"
 )
 
+
 my_button = ui.Button(100, 400, 200, 600, (128, 50, 30))
+my_button.on_click(lambda a : print("Clicked"))
+my_button.on_hover(lambda a : print("Hovering"))  # Testing button handlers
+my_button.on_press(lambda a : print("Pressed"))  # Testing button handlers
 
 while not my_app.is_closing:
     my_app.screen.fill((127, 127, 127))
 
+    # Update    
+    my_button.update()
+
     # Handle events
     for event in pygame.event.get():
+        my_button.handle_events(event)
+
         match event.type:
             case pygame.QUIT:
                 my_app.is_closing = True
@@ -79,8 +88,8 @@ while not my_app.is_closing:
                     collector.gold -= items[upgrade_item_id].upgrade_cost
                 
                 my_message.text = str(collector.gold)
-                    
-                
+          
+    # Draw    
     my_grid.draw(my_app.screen)
     upgrade_grid.draw(my_app.screen)
 
