@@ -17,6 +17,7 @@ class Message:
     
     @text.setter
     def text(self, new_text):
-        self._text = new_text
-        self.text_surface = self.font.render(new_text, False, self.color)
+        if self._text != new_text:
+            self._text = new_text
+            self.text_surface = self.font.render(new_text, False, self.color)
 
