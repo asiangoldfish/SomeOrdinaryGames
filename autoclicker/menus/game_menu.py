@@ -86,22 +86,6 @@ class GameMenu(ui.Canvas):
     def handle_events(self, event):
         super().handle_events(event)
 
-        # match event.type:
-        # case pygame.MOUSEBUTTONDOWN:
-        # Get coins by clicking tile
-        # coins_rewarded = self.my_grid.get_overlapped_tile()
-        # self.collector.gold += coins_rewarded
-
-        # # Upgrade item multiplier
-        # upgrade_item_id = self.upgrade_grid.get_overlapped_tile()
-        # if upgrade_item_id >= 0 and self.collector.gold >= self.items[upgrade_item_id].upgrade_cost:
-        # self.items[upgrade_item_id].upgrade_multiplier()
-        # self.collector.gold -= self.items[upgrade_item_id].upgrade_cost
-
-        # self.my_message.text = "Gold: " + str(self.collector.gold)
-
     def draw(self, screen):
         super().draw(screen)
-
-        # self.upgrade_grid.draw(screen)
         self.my_message.draw(screen)
