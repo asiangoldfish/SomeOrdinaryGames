@@ -9,17 +9,18 @@ import numpy as np
 
 
 class Button(BaseUI):
-    def __init__(self, pos: Vec2, size: Vec2, text: str = "", fg_color: Vec3 = Vec3(255, 255, 255), bg_color: Vec3 = Vec3(50,50,50)):
+    def __init__(self, pos: Vec2, size: Vec2, text: str = "", fg_color: Vec3 = Vec3(255, 255, 255), bg_color: Vec3 = Vec3(50, 50, 50), font_size=50):
         # https://stackoverflow.com/a/63763175
         self.pos = pos
         self.size = size
-        self.fg_color = fg_color
-        self.bg_color = bg_color
-        self.text = text
+        self._fg_color = fg_color
+        self._bg_color = bg_color
+        self._text = text
         self.text_offset = Vec2(1, 5)
         self.font = pygame.font.Font(
-            pygame.font.get_default_font(), (self.size/2).y)
-        self.font_surface = self.font.render(f"{text}", True, fg_color.to_tuple())
+            pygame.font.get_default_font(), font_size)
+        self.font_surface = self.font.render(
+            f"{text}", True, fg_color.to_tuple())
         self.surface = pygame.Surface((*self.size,)).convert()
         self.surface.fill(self.bg_color.to_tuple())
 
@@ -32,6 +33,38 @@ class Button(BaseUI):
         self._on_press_args = []
         self._on_click_handle = None
         self.on_click_args = []
+
+    ##########
+    # Accessors and mutators
+    ##########
+    @property
+    def bg_color(self):
+        return self._bg_color
+
+    @bg_color.setter
+    def bg_color(self, new_bg_color):
+        self._bg_color = new_bg_color
+        self.surface.fill(new_bg_color.to_tuple())
+
+    @property
+    def fg_color(self):
+        return self._fg_color
+
+    @fg_color.setter
+    def fg_color(self, new_color):
+        self._fg_color = new_color
+        self.font_surface = self.font.render(
+            f"{self._text}", True, self.fg_color.to_tuple())
+
+    @property
+    def text(self):
+        return self._text
+
+    @text.setter
+    def text(self, new_text):
+        self._text = new_text
+        self.font_surface = self.font.render(
+            f"{self._text}", True, self.fg_color.to_tuple())
 
     def update(self):
         self.is_mouse_hovered = self.surface.get_rect(
@@ -51,8 +84,12 @@ class Button(BaseUI):
                     self._on_click_handle(self._on_click_args)
 
     def draw(self, screen: pygame.Surface):
+        font_surface_divided = Vec2.from_tuple(self.font_surface.get_size())/2
         screen.blit(self.surface, ((*self.pos,)))
-        screen.blit(self.font_surface, (self.pos + self.text_offset).to_tuple())
+
+        # Draw the text centralised in the button
+        screen.blit(self.font_surface, (self.pos + self.size /
+                    2 - font_surface_divided).to_tuple())
 
     ##########################################
     # Handlers

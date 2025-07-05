@@ -14,50 +14,74 @@ class GameMenu(ui.Canvas):
         super().__init__()
         self.items = items
         self.collector = collector
-
-        # self.carrot_btn = ui.Button(
-        #     pos=Vec2(170, 500), size=Vec2(400, 100), text="Carrots")
+        self.item_btns = []
+        self.upgrade_btns = []
+        self.disable_upgrade_colour = Vec3(30,30,10)
+        self.enable_upgrade_color = Vec3(127,100,50)
+        self.disable_text = Vec3(70)
+        self.enable_text = Vec3(150)
 
         # Create a button for each item
         for i, item in enumerate(self.items):
             button = ui.Button(
-                pos=Vec2(170, 500 + i * 110),
+                pos=Vec2(70, 500 + i * 110),
                 size=Vec2(400, 100),
-                text=item.name
+                text=item.name,
+                font_size=40
             )
-
             # Bind click to item using a closure (capture item value)
-            button.on_click(
-                lambda it: self._collect_from_item(*it), item)
-
+            button.on_click(lambda it: self._collect_from_item(*it), item)
             self.ui_elements.append(button)
+            self.item_btns.append(button)
 
-        # self.upgrade_grid = game.grid.UpgradeGrid(
-        #     pos=np.array((600, 500)),
-        #     size=np.array([100.0, 100.0]),
-        #     rows=1,
-        #     color=np.array((0, 0, 0, 255)),
-        #     gap=20.0,
-        #     items=items)
-        # self.upgrade_grid.create_grid()
+        # Upgrade button for each item
+        for i, item in enumerate(self.items):
+            button = ui.Button(
+                pos=Vec2(500, 500 + i * 110),
+                size=Vec2(270, 100),
+                text=f"Lv{str(item.level)} ({str(math.floor(item.upgrade_cost))})",
+                bg_color=self.disable_upgrade_colour,
+                fg_color=self.disable_text
+            )
+            button.on_click(
+                lambda it: self._upgrade_item(*it), item, button)
+            self.ui_elements.append(button)
+            self.upgrade_btns.append(button)
 
         self.my_message = core.Message(
             pos=np.array((200, 100)),
             text="Gold: 0"
         )
 
-        # Dirty trick to go back to main menu by registering a handle which the
-        # entry script must register.
-
         self.main_menu_btn = ui.Button(
-            Vec2(10, 10), Vec2(100, 100), "<-", Vec3(50, 50, 50))
+            pos=Vec2(10, 10), size=Vec2(100, 100), text="<-", font_size=50)
 
         self.ui_elements.append(self.main_menu_btn)
+
+    def _update_upgrade_btn_color(self):
+        for i, btn in enumerate(self.upgrade_btns):
+            if self.collector.gold < self.items[i].upgrade_cost:
+                btn.bg_color = self.disable_upgrade_colour
+                btn.fg_color = self.disable_text
+            else:
+                btn.bg_color = self.enable_upgrade_color
+                btn.fg_coclor = self.enable_text
 
     def _collect_from_item(self, item: game.Item):
         new_value = item.value * item.multiplier
         self.collector.gold += new_value
         self.my_message.text = f"Gold: " + str(math.floor(self.collector.gold))
+        self._update_upgrade_btn_color()
+
+    def _upgrade_item(self, item: game.Item, button: ui.Button):
+        if self.collector.gold >= item.upgrade_cost:
+            item.upgrade_multiplier()
+            button.text = f"Lv{str(item.level)} ({str(math.floor(item.upgrade_cost))})"
+            self.collector.gold -= item.upgrade_cost
+            self.my_message.text = "Gold: " + \
+                str(math.floor(self.collector.gold))
+            self._update_upgrade_btn_color()
+            
 
     def handle_events(self, event):
         super().handle_events(event)
