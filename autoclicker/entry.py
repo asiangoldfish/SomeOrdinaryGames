@@ -2,10 +2,8 @@ import pygame
 import numpy as np
 
 import core.app as app
-import sprite
 import game
 import core.message as message
-import ui
 import menus
 
 import atexit
@@ -27,7 +25,7 @@ items = [
 collector = game.Collector()
 
 ##########
-# Canvas
+# Menus
 ##########
 
 game_menu = menus.GameMenu(items, collector)
@@ -39,24 +37,27 @@ def switch_to_main_menu(arg):
     active_menu = main_menu
     print("Switching to main menu")
 
-game_menu.register_main_menu_callback(switch_to_main_menu, None)
+def switch_to_play_game(arg):
+    global active_menu
+    active_menu = game_menu
+    print("Switching to play game")
 
-# my_button = ui.Button(100, 400, 200, 600, (128, 50, 30))
-# my_button.on_click(lambda a: print("Clicked"))
-# my_button.on_hover(lambda a: print("Hovering"))  # Testing button handlers
-# my_button.on_press(lambda a: print("Pressed"))  # Testing button handlers
+def quit_game_handler(arg):
+    global my_app
+    my_app.is_closing = True
+
+game_menu.main_menu_btn.on_click(switch_to_main_menu, None)
+main_menu.play_game_btn.on_click(switch_to_play_game, None)
+main_menu.quit_game_btn.on_click(quit_game_handler, None)
 
 while not my_app.is_closing:
     my_app.screen.fill((127, 127, 127))
 
     # Update
-    # my_button.update()
     active_menu.update()
 
     # Handle events
     for event in pygame.event.get():
-        # my_button.handle_events(event)
-
         active_menu.handle_events(event)
 
         match event.type:

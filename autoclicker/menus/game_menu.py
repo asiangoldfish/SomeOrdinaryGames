@@ -73,6 +73,3 @@ class GameMenu(ui.Canvas):
         self.my_grid.draw(screen)
         self.upgrade_grid.draw(screen)
         self.my_message.draw(screen)
-
-    def register_main_menu_callback(self, func, *args):
-        self.main_menu_btn.on_click(func, *args)
