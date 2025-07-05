@@ -13,8 +13,10 @@ class MainMenu(ui.Canvas):
             text="Main Menu"
         )
 
-        self.play_game_btn = ui.Button(150, 400, 500, 100, (50, 50, 50))
-        self.quit_game_btn = ui.Button(150, 600, 500, 100, (50, 50, 50))
+        self.play_game_btn = ui.Button(pos=core.Vec2(150, 400), size=core.Vec2(
+            500, 100), text="Play")
+        self.quit_game_btn = ui.Button(pos=core.Vec2(150, 600), size=core.Vec2(
+            500, 100), text="Quit")
         self.ui_elements.extend((self.play_game_btn, self.quit_game_btn))
 
     def draw(self, screen):
