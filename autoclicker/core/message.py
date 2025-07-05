@@ -6,7 +6,7 @@ class Message:
         self.color = color
         self._text = text
         self.font = pygame.font.SysFont("Comic Sans MS", font_size)
-        self.text_surface = self.font.render(f"Gold: {self._text}", False, self.color)
+        self.text_surface = self.font.render(self._text, False, self.color)
 
     def draw(self, screen):
         screen.blit(self.text_surface, self.pos)
@@ -18,5 +18,5 @@ class Message:
     @text.setter
     def text(self, new_text):
         self._text = new_text
-        self.text_surface = self.font.render(f"Gold: {new_text}", False, self.color)
+        self.text_surface = self.font.render(new_text, False, self.color)
 

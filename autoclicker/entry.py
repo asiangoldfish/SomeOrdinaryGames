@@ -6,6 +6,7 @@ import sprite
 import game
 import core.message as message
 import ui
+import menus
 
 import atexit
 
@@ -25,44 +26,38 @@ items = [
 ]
 collector = game.Collector()
 
-my_grid = game.grid.Grid(
-    pos = np.array((170, 500)),
-    size=np.array([400.0, 100.0]),
-    rows = 1,
-    color=np.array((0,0,0,255)),
-    gap = 20.0,
-    items=items)
-my_grid.create_grid()
+##########
+# Canvas
+##########
 
-upgrade_grid = game.grid.UpgradeGrid(
-    pos = np.array((600, 500)),
-    size=np.array([100.0, 100.0]),
-    rows = 1,
-    color=np.array((0,0,0,255)),
-    gap = 20.0,
-    items=items)
-upgrade_grid.create_grid()
+game_menu = menus.GameMenu(items, collector)
+main_menu = menus.MainMenu()
+active_menu = game_menu
 
-my_message = message.Message(
-    pos=np.array((200,100)),
-    text="0"
-)
+def switch_to_main_menu(arg):
+    global active_menu
+    active_menu = main_menu
+    print("Switching to main menu")
 
+game_menu.register_main_menu_callback(switch_to_main_menu, None)
 
-my_button = ui.Button(100, 400, 200, 600, (128, 50, 30))
-my_button.on_click(lambda a : print("Clicked"))
-my_button.on_hover(lambda a : print("Hovering"))  # Testing button handlers
-my_button.on_press(lambda a : print("Pressed"))  # Testing button handlers
+# my_button = ui.Button(100, 400, 200, 600, (128, 50, 30))
+# my_button.on_click(lambda a: print("Clicked"))
+# my_button.on_hover(lambda a: print("Hovering"))  # Testing button handlers
+# my_button.on_press(lambda a: print("Pressed"))  # Testing button handlers
 
 while not my_app.is_closing:
     my_app.screen.fill((127, 127, 127))
 
-    # Update    
-    my_button.update()
+    # Update
+    # my_button.update()
+    active_menu.update()
 
     # Handle events
     for event in pygame.event.get():
-        my_button.handle_events(event)
+        # my_button.handle_events(event)
+
+        active_menu.handle_events(event)
 
         match event.type:
             case pygame.QUIT:
@@ -70,35 +65,10 @@ while not my_app.is_closing:
             case pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     my_app.is_closing = True
-                elif event.key == pygame.K_SPACE:
-                    collector.gold += collector.carrots.value
-                    
-                    my_message.text = str(collector.gold)
 
-            # Select tile
-            case pygame.MOUSEBUTTONDOWN:
-                # Get coins by clicking tile
-                coins_rewarded = my_grid.get_overlapped_tile()
-                collector.gold += coins_rewarded
-                
-                # Upgrade item multiplier
-                upgrade_item_id = upgrade_grid.get_overlapped_tile()
-                if upgrade_item_id >= 0 and collector.gold >= items[upgrade_item_id].upgrade_cost:
-                    items[upgrade_item_id].upgrade_multiplier()
-                    collector.gold -= items[upgrade_item_id].upgrade_cost
-                
-                my_message.text = str(collector.gold)
-          
-    # Draw    
-    my_grid.draw(my_app.screen)
-    upgrade_grid.draw(my_app.screen)
-
-    my_message.draw(my_app.screen)
-
-    my_button.draw(my_app.screen)
+    # Draw
+    active_menu.draw(my_app.screen)
 
     pygame.display.update()
 
     my_app.delta = my_app.clock.tick(60) / 1000
-    
-        
