@@ -9,7 +9,7 @@ class Message:
         self.text_surface = self.font.render(self._text, False, self.color)
 
     def draw(self, screen):
-        screen.blit(self.text_surface, self.pos)
+        screen.blit(self.text_surface, tuple(self.pos))
 
     @property
     def text(self):

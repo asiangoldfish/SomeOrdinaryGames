@@ -37,6 +37,7 @@ collector = game.Collector()
 
 game_menu = menus.GameMenu(items, collector)
 main_menu = menus.MainMenu()
+pause_menu = menus.PauseMenu()
 active_menu = game_menu
 
 
@@ -56,10 +57,15 @@ def quit_game_handler(arg):
     global my_app
     my_app.is_closing = True
 
+def save_game_handler(arg):
+    print("Game saved!")
+
 
 game_menu.main_menu_btn.on_click(switch_to_main_menu, None)
 main_menu.play_game_btn.on_click(switch_to_play_game, None)
 main_menu.quit_game_btn.on_click(quit_game_handler, None)
+pause_menu.main_menu_btn.on_click(switch_to_main_menu, None)
+pause_menu.save_game_btn.on_click(save_game_handler, None)
 
 while not my_app.is_closing:
     my_app.screen.fill((127, 127, 127))
@@ -76,7 +82,11 @@ while not my_app.is_closing:
                 my_app.is_closing = True
             case pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
-                    my_app.is_closing = True
+                    # While in-game, toggle between the game and the pause menu.
+                    if active_menu is game_menu:
+                        active_menu = pause_mmenu
+                    elif active_menu is pause_mmenu:
+                        active_menu = game_menu
 
     # Draw
     active_menu.draw(my_app.screen)
