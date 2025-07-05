@@ -16,8 +16,8 @@ class GameMenu(ui.Canvas):
         self.collector = collector
         self.item_btns = []
         self.upgrade_btns = []
-        self.disable_upgrade_colour = Vec3(30,30,10)
-        self.enable_upgrade_color = Vec3(127,100,50)
+        self.disable_upgrade_colour = Vec3(30, 30, 10)
+        self.enable_upgrade_color = Vec3(127, 100, 50)
         self.disable_text = Vec3(70)
         self.enable_text = Vec3(150)
 
@@ -30,7 +30,7 @@ class GameMenu(ui.Canvas):
                 font_size=40
             )
             # Bind click to item using a closure (capture item value)
-            button.on_click(lambda it: self._collect_from_item(*it), item)
+            button.on_click(lambda it: self._collect_from_item(it), item)
             self.ui_elements.append(button)
             self.item_btns.append(button)
 
@@ -44,7 +44,7 @@ class GameMenu(ui.Canvas):
                 fg_color=self.disable_text
             )
             button.on_click(
-                lambda it: self._upgrade_item(*it), item, button)
+                lambda item, button: self._upgrade_item(item, button), item, button)
             self.ui_elements.append(button)
             self.upgrade_btns.append(button)
 
@@ -56,7 +56,10 @@ class GameMenu(ui.Canvas):
         self.main_menu_btn = ui.Button(
             pos=Vec2(10, 10), size=Vec2(100, 100), text="<-", font_size=50)
 
-        self.ui_elements.append(self.main_menu_btn)
+        self.upgrade_menu_btn = ui.Button(
+            pos=Vec2(690, 10), size=Vec2(100, 100), text="+")
+
+        self.ui_elements.extend((self.main_menu_btn, self.upgrade_menu_btn))
 
     def _update_upgrade_btn_color(self):
         for i, btn in enumerate(self.upgrade_btns):
@@ -70,7 +73,6 @@ class GameMenu(ui.Canvas):
     def _collect_from_item(self, item: game.Item):
         new_value = item.value * item.multiplier
         self.collector.gold += new_value
-        self.my_message.text = f"Gold: " + str(math.floor(self.collector.gold))
         self._update_upgrade_btn_color()
 
     def _upgrade_item(self, item: game.Item, button: ui.Button):
@@ -78,10 +80,7 @@ class GameMenu(ui.Canvas):
             item.upgrade_multiplier()
             button.text = f"Lv{str(item.level)} ({str(math.floor(item.upgrade_cost))})"
             self.collector.gold -= item.upgrade_cost
-            self.my_message.text = "Gold: " + \
-                str(math.floor(self.collector.gold))
             self._update_upgrade_btn_color()
-            
 
     def handle_events(self, event):
         super().handle_events(event)
@@ -89,3 +88,12 @@ class GameMenu(ui.Canvas):
     def draw(self, screen):
         super().draw(screen)
         self.my_message.draw(screen)
+
+    def update(self):
+        super().update()
+        self.my_message.text = f"Gold: {math.floor(self.collector.gold)}"
+
+        for i, item in enumerate(self.items):
+            if item.enable_automation:
+                self.item_btns[i].text = f"{item.name} ({"{:.2f}".format(item.current_timer)})"
+

@@ -18,18 +18,30 @@ items = [
         name="Carrots",
         value=1,
         upgrade_cost=30,
-        multiplier_upgrade_bonus=3.0
+        multiplier_upgrade_bonus=3.0,
+        autoclick_cooldown=3.0,
+        automation_cost=100
     ),
     game.Item(
         name="Potatoes",
         value=3,
         upgrade_cost=100,
-        multiplier_upgrade_bonus=3.0
+        multiplier_upgrade_bonus=3.0,
+        autoclick_cooldown=10.0,
+        automation_cost=1000
+    ),
+    game.Item(
+        name="Bamboo",
+        value=100,
+        upgrade_cost=1000,
+        multiplier_upgrade_bonus=5.0,
+        autoclick_cooldown=30.0,
+        automation_cost=20000
     )
 ]
 for i, item in enumerate(items):
     item.id = i
-collector = game.Collector()
+collector = game.Collector(items)
 
 ##########
 # Menus
@@ -38,40 +50,48 @@ collector = game.Collector()
 game_menu = menus.GameMenu(items, collector)
 main_menu = menus.MainMenu()
 pause_menu = menus.PauseMenu()
-active_menu = game_menu
+shop_menu = menus.ShopMenu(items, collector)
+active_menu = main_menu
 
 
-def switch_to_main_menu(arg):
+def switch_to_main_menu_handler(arg):
     global active_menu
     active_menu = main_menu
-    print("Switching to main menu")
 
 
-def switch_to_play_game(arg):
+def switch_to_play_game_handler(arg):
     global active_menu
     active_menu = game_menu
-    print("Switching to play game")
+
+
+def switch_to_shop_menu_handler(arg):
+    global active_menu
+    active_menu = shop_menu
 
 
 def quit_game_handler(arg):
     global my_app
     my_app.is_closing = True
 
+
 def save_game_handler(arg):
     print("Game saved!")
 
 
-game_menu.main_menu_btn.on_click(switch_to_main_menu, None)
-main_menu.play_game_btn.on_click(switch_to_play_game, None)
+game_menu.main_menu_btn.on_click(switch_to_main_menu_handler, None)
+game_menu.upgrade_menu_btn.on_click(switch_to_shop_menu_handler, None)
+main_menu.play_game_btn.on_click(switch_to_play_game_handler, None)
 main_menu.quit_game_btn.on_click(quit_game_handler, None)
-pause_menu.main_menu_btn.on_click(switch_to_main_menu, None)
+pause_menu.main_menu_btn.on_click(switch_to_main_menu_handler, None)
 pause_menu.save_game_btn.on_click(save_game_handler, None)
+shop_menu.game_menu_btn.on_click(switch_to_play_game_handler, None)
 
 while not my_app.is_closing:
     my_app.screen.fill((127, 127, 127))
 
     # Update
     active_menu.update()
+    collector.update(my_app.delta)
 
     # Handle events
     for event in pygame.event.get():
@@ -84,8 +104,11 @@ while not my_app.is_closing:
                 if event.key == pygame.K_ESCAPE:
                     # While in-game, toggle between the game and the pause menu.
                     if active_menu is game_menu:
-                        active_menu = pause_mmenu
-                    elif active_menu is pause_mmenu:
+                        active_menu = pause_menu
+                    elif active_menu is pause_menu:
+                        active_menu = game_menu
+                    elif active_menu is shop_menu:
+                        # Return to game from upgrade menu
                         active_menu = game_menu
 
     # Draw
