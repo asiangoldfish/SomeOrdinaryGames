@@ -15,13 +15,20 @@ floor = my_app.SCREEN_HEIGHT - 100
 
 items = [
     game.Item(
-        id=0,
         name="Carrots",
         value=1,
-        upgrade_cost=10,
+        upgrade_cost=30,
+        multiplier_upgrade_bonus=3.0
+    ),
+    game.Item(
+        name="Potatoes",
+        value=3,
+        upgrade_cost=100,
         multiplier_upgrade_bonus=3.0
     )
 ]
+for i, item in enumerate(items):
+    item.id = i
 collector = game.Collector()
 
 ##########
@@ -32,19 +39,23 @@ game_menu = menus.GameMenu(items, collector)
 main_menu = menus.MainMenu()
 active_menu = game_menu
 
+
 def switch_to_main_menu(arg):
     global active_menu
     active_menu = main_menu
     print("Switching to main menu")
+
 
 def switch_to_play_game(arg):
     global active_menu
     active_menu = game_menu
     print("Switching to play game")
 
+
 def quit_game_handler(arg):
     global my_app
     my_app.is_closing = True
+
 
 game_menu.main_menu_btn.on_click(switch_to_main_menu, None)
 main_menu.play_game_btn.on_click(switch_to_play_game, None)
