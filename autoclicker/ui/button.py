@@ -81,7 +81,7 @@ class Button(BaseUI):
         match event.type:
             case pygame.MOUSEBUTTONDOWN:
                 if self._on_click_handle and self.is_mouse_hovered:
-                    self._on_click_handle(self._on_click_args)
+                    self._on_click_handle(*self._on_click_args)
 
     def draw(self, screen: pygame.Surface):
         font_surface_divided = Vec2.from_tuple(self.font_surface.get_size())/2
