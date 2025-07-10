@@ -10,9 +10,9 @@ class Canvas:
     def __init__(self):
         self.ui_elements = []
 
-    def update(self):
+    def update(self, delta):
         for e in self.ui_elements:
-            e.update()
+            e.update(delta)
 
 
     def handle_events(self, event):

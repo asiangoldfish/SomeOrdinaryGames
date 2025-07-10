@@ -20,7 +20,8 @@ items = [
         upgrade_cost=30,
         multiplier_upgrade_bonus=3.0,
         autoclick_cooldown=3.0,
-        automation_cost=100
+        automation_cost=100,
+        is_enabled=True,
     ),
     game.Item(
         name="Potatoes",
@@ -28,7 +29,8 @@ items = [
         upgrade_cost=100,
         multiplier_upgrade_bonus=3.0,
         autoclick_cooldown=10.0,
-        automation_cost=1000
+        automation_cost=1000,
+        unlock_cost=200
     ),
     game.Item(
         name="Bamboo",
@@ -36,7 +38,8 @@ items = [
         upgrade_cost=1000,
         multiplier_upgrade_bonus=5.0,
         autoclick_cooldown=30.0,
-        automation_cost=20000
+        automation_cost=20000,
+        unlock_cost=5000
     )
 ]
 for i, item in enumerate(items):
@@ -90,7 +93,7 @@ while not my_app.is_closing:
     my_app.screen.fill((127, 127, 127))
 
     # Update
-    active_menu.update()
+    active_menu.update(my_app.delta)
     collector.update(my_app.delta)
 
     # Handle events

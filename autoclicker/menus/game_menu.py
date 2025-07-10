@@ -4,7 +4,6 @@ import core
 from core import Vec2, Vec3
 
 import numpy as np
-import pygame
 
 import math
 
@@ -21,32 +20,7 @@ class GameMenu(ui.Canvas):
         self.disable_text = Vec3(70)
         self.enable_text = Vec3(150)
 
-        # Create a button for each item
-        for i, item in enumerate(self.items):
-            button = ui.Button(
-                pos=Vec2(70, 500 + i * 110),
-                size=Vec2(400, 100),
-                text=item.name,
-                font_size=40
-            )
-            # Bind click to item using a closure (capture item value)
-            button.on_click(lambda it: self._collect_from_item(it), item)
-            self.ui_elements.append(button)
-            self.item_btns.append(button)
-
-        # Upgrade button for each item
-        for i, item in enumerate(self.items):
-            button = ui.Button(
-                pos=Vec2(500, 500 + i * 110),
-                size=Vec2(270, 100),
-                text=f"Lv{str(item.level)} ({str(math.floor(item.upgrade_cost))})",
-                bg_color=self.disable_upgrade_colour,
-                fg_color=self.disable_text
-            )
-            button.on_click(
-                lambda item, button: self._upgrade_item(item, button), item, button)
-            self.ui_elements.append(button)
-            self.upgrade_btns.append(button)
+        self.sync_items_buttons()
 
         self.my_message = core.Message(
             pos=np.array((200, 100)),
@@ -89,11 +63,48 @@ class GameMenu(ui.Canvas):
         super().draw(screen)
         self.my_message.draw(screen)
 
-    def update(self):
-        super().update()
+    def update(self, delta):
+        super().update(delta)
         self.my_message.text = f"Gold: {math.floor(self.collector.gold)}"
 
         for i, item in enumerate(self.items):
             if item.enable_automation:
                 self.item_btns[i].text = f"{item.name} ({"{:.2f}".format(item.current_timer)})"
 
+
+    def sync_items_buttons(self):
+        """Add buttons for each enabled item
+        """
+
+        # Create a button for each item
+        for i, item in enumerate(self.items):
+            if not item.is_enabled:
+                continue
+
+            button = ui.Button(
+                pos=Vec2(70, 500 + i * 110),
+                size=Vec2(400, 100),
+                text=item.name,
+                font_size=40
+            )
+            # Bind click to item using a closure (capture item value)
+            button.on_click(lambda it: self._collect_from_item(it), item)
+            self.ui_elements.append(button)
+            self.item_btns.append(button)
+
+        # Upgrade button for each item
+        for i, item in enumerate(self.items):
+            if not item.is_enabled:
+                continue
+
+            button = ui.Button(
+                pos=Vec2(500, 500 + i * 110),
+                size=Vec2(270, 100),
+                text=f"Lv{str(item.level)} ({str(math.floor(item.upgrade_cost))})",
+                bg_color=self.disable_upgrade_colour,
+                fg_color=self.disable_text
+            )
+            button.on_click(
+                lambda item, button: self._upgrade_item(item, button), item, button)
+            self.ui_elements.append(button)
+            self.upgrade_btns.append(button)

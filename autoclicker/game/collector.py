@@ -12,6 +12,8 @@ class Item:
     enable_automation: bool = False
     automation_cost: int = 10
     level: int = 0
+    is_enabled: bool = False
+    unlock_cost: int = 0
 
     # Timer settings for autoclick
     current_timer: float = 0.0
@@ -20,7 +22,7 @@ class Item:
     def upgrade_multiplier(self):
         self.multiplier += self.multiplier_upgrade_bonus
         self.level += 1
-
+    
 
 class Collector:
     def __init__(self, items):

@@ -9,8 +9,9 @@ import numpy as np
 
 
 class Button(BaseUI):
-    def __init__(self, pos: Vec2, size: Vec2, text: str = "", fg_color: Vec3 = Vec3(255, 255, 255), bg_color: Vec3 = Vec3(50, 50, 50), font_size=50):
+    def __init__(self, pos: Vec2, size: Vec2, text: str = "", fg_color: Vec3 = Vec3(255, 255, 255), bg_color: Vec3 = Vec3(50, 50, 50), font_size=50, id: int = -1):
         # https://stackoverflow.com/a/63763175
+        self.id = id
         self.pos = pos
         self.size = size
         self._fg_color = fg_color
@@ -23,6 +24,12 @@ class Button(BaseUI):
             f"{text}", True, fg_color.to_tuple())
         self.surface = pygame.Surface((*self.size,)).convert()
         self.surface.fill(self.bg_color.to_tuple())
+
+        self._is_enabled = True
+        self.disable_upgrade_colour = Vec3(30, 30, 10)
+        self.enable_upgrade_color = Vec3(127, 100, 50)
+        self.disable_text = Vec3(70)
+        self.enable_text = Vec3(150)
 
         self.is_mouse_hovered = False
         self.is_mouse_clicked = False  # Single click registered
@@ -64,9 +71,28 @@ class Button(BaseUI):
     def text(self, new_text):
         self._text = new_text
         self.font_surface = self.font.render(
-            f"{self._text}", True, self.fg_color.to_tuple())
+            f"{self._text}", True, self._fg_color.to_tuple())
 
-    def update(self):
+    @property
+    def is_enabled(self):
+        return self._is_enabled
+
+    @text.setter
+    def is_enabled(self, enable):
+        if self._is_enabled is enable:
+            pass
+
+        self._is_enabled = enable
+        if enable:
+            self.font_surface = self.font.render(
+                f"{self._text}", True, self.enable_text.to_tuple())
+            self.surface.fill(self.enable_upgrade_color.to_tuple())
+        else:
+            self.font_surface = self.font.render(
+                f"{self._text}", True, self.disable_text.to_tuple())
+            self.surface.fill(self.disable_upgrade_colour.to_tuple())
+
+    def update(self, delta):
         self.is_mouse_hovered = self.surface.get_rect(
             topleft=tuple(self.pos)).collidepoint(pygame.mouse.get_pos())
 
