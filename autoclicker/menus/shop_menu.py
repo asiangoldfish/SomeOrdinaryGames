@@ -46,6 +46,7 @@ class ShopMenu(ui.Canvas):
         self.current_gold_txt.draw(screen)
 
     def update(self, delta):
+        super().update(delta)
         self.current_gold_txt.text = f"Gold: {math.floor(self.collector.gold)}"
         # TODO update the button's enabled or disabled
         for e in self.ui_elements:
